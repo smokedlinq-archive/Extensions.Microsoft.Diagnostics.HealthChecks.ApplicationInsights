@@ -13,7 +13,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -34,7 +34,7 @@ jobs:
     - name: Cache SonarCloud packages
       uses: actions/cache@v1
       with:
-        path: ~\sonar\cache
+        path: ~/sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
 
@@ -42,7 +42,7 @@ jobs:
       id: cache-sonar-scanner
       uses: actions/cache@v1
       with:
-        path: .\.sonar\scanner
+        path: ./.sonar/scanner
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
 
@@ -50,8 +50,8 @@ jobs:
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        New-Item -Path .\.sonar\scanner -ItemType Directory
-        dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+        New-Item -Path ./.sonar/scanner -ItemType Directory
+        dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
         
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
@@ -65,9 +65,9 @@ jobs:
       shell: pwsh
       run: |
         dotnet test --configuration Release --logger 'console;verbosity=detailed' /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-        .\.sonar\scanner\dotnet-sonarscanner begin /k:'smokedlinq_Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights' /o:'smokedlinq-github' /d:sonar.login='${{ secrets.SONAR_TOKEN }}' /d:sonar.host.url='https://sonarcloud.io' /d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:'smokedlinq_Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights' /o:'smokedlinq-github' /d:sonar.login='${{ secrets.SONAR_TOKEN }}' /d:sonar.host.url='https://sonarcloud.io' /d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
         dotnet build --configuration Release --no-incremental
-        .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login='${{ secrets.SONAR_TOKEN }}'
+        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login='${{ secrets.SONAR_TOKEN }}'
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
