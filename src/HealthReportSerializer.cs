@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -8,7 +7,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights
+namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 {
     public static class HealthReportSerializer
     {

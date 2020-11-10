@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights;
 using System;
 using System.Reflection;
 
-namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ApplicationInsightsHealthCheckPublisherServiceCollectionExtensions
     {

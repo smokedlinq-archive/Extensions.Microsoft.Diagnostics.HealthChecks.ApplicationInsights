@@ -1,4 +1,4 @@
-﻿namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights
+﻿namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 {
     public class ApplicationInsightsHealthCheckPublisherOptions
     {

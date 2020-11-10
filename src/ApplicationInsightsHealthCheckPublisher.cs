@@ -1,5 +1,4 @@
 ﻿using Microsoft.ApplicationInsights;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections;
@@ -9,7 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights
+namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 {
     public class ApplicationInsightsHealthCheckPublisher : IHealthCheckPublisher
     {
