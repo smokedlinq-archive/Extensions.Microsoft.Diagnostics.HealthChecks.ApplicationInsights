@@ -27,7 +27,7 @@ namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights.Test
                 setup.Sut(new ApplicationInsightsHealthCheckPublisher(client, Options.Create(new ApplicationInsightsHealthCheckPublisherOptions())));
                 return new HealthReport(entries, setup.Fixture.Create<TimeSpan>());
             })
-            .Act((sut, report) => sut.Invoking(x => x.PublishAsync(report, CancellationToken.None)))
+            .Act((sut, report) => sut.Invoking(x => x.PublishAsync(report!, CancellationToken.None)))
             .Assert(result => result.Should().NotThrow());
     }
 }

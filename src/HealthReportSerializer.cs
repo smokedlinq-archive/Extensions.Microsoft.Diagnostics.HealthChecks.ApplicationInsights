@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
             => JsonSerializer.SerializeAsync(stream, report, __options, cancellationToken);
 
         public static HealthReport Deserialize(string json)
-            => JsonSerializer.Deserialize<HealthReport>(json, __options);
+            => JsonSerializer.Deserialize<HealthReport>(json, __options)!;
 
         private class TimeSpanConverter : JsonConverter<TimeSpan>
         {
@@ -72,7 +72,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                         var propertyName = reader.GetString();
                         reader.Read();
 
-                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName.ToLowerInvariant())
+                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName?.ToLowerInvariant())
                         {
                             case "Type":
                             case "type":
@@ -114,6 +114,9 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                 _ = writer ?? throw new ArgumentNullException(nameof(writer));
                 _ = options ?? throw new ArgumentNullException(nameof(options));
 
+                string ConvertName(string name)
+                    => options.PropertyNamingPolicy?.ConvertName(name) ?? name;
+
                 if (value is null)
                 {
                     writer.WriteNullValue();
@@ -124,28 +127,28 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 
                 if (value is JsonSerializedException jse)
                 {
-                    writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(Type)), jse.Type);
+                    writer.WriteString(ConvertName(nameof(Type)), jse.Type);
                 }
                 else
                 {
-                    writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(Type)), value.GetType().AssemblyQualifiedName);
+                    writer.WriteString(ConvertName(nameof(Type)), value.GetType().AssemblyQualifiedName);
                 }
 
                 if (!(value.Message is null) || !options.IgnoreNullValues)
                 {
-                    writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(value.Message)), value.Message);
+                    writer.WriteString(ConvertName(nameof(value.Message)), value.Message);
                 }
 
-                writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(value.StackTrace)), value.StackTrace);
+                writer.WriteString(ConvertName(nameof(value.StackTrace)), value.StackTrace);
 
                 if (!(value.Source is null) || !options.IgnoreNullValues)
                 {
-                    writer.WriteString(options.PropertyNamingPolicy.ConvertName(nameof(value.Source)), value.Source);
+                    writer.WriteString(ConvertName(nameof(value.Source)), value.Source);
                 }
 
                 if (!(value.InnerException is null) || !options.IgnoreNullValues)
                 {
-                    writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.InnerException)));
+                    writer.WritePropertyName(ConvertName(nameof(value.InnerException)));
                     if (value.InnerException is null)
                     {
                         writer.WriteNullValue();
@@ -159,7 +162,6 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                 writer.WriteEndObject();
             }
 
-#pragma warning disable S3871,CA1032,CA1064 // special exception type for serialization
             private class JsonSerializedException : Exception
             {
                 private readonly string _stackTrace;
@@ -176,7 +178,6 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 
                 public override string StackTrace => _stackTrace;
             }
-#pragma warning restore S3871,CA1032,CA1064
         }
 
         private class HealthReportConverter : JsonConverter<HealthReport>
@@ -198,7 +199,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                         var propertyName = reader.GetString();
                         reader.Read();
 
-                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName.ToLowerInvariant())
+                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName?.ToLowerInvariant())
                         {
                             case "TotalDuration":
                             case "totalDuration":
@@ -214,20 +215,23 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                     }
                 }
 
-                return new HealthReport(entries, totalDuration);
+                return new HealthReport(entries ?? new(), totalDuration);
             }
 
             public override void Write(Utf8JsonWriter writer, HealthReport value, JsonSerializerOptions options)
             {
+                string ConvertName(string name)
+                    => options.PropertyNamingPolicy?.ConvertName(name) ?? name;
+
                 writer.WriteStartObject();
 
-                writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Status)));
+                writer.WritePropertyName(ConvertName(nameof(value.Status)));
                 JsonSerializer.Serialize(writer, value.Status, options);
 
-                writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.TotalDuration)));
+                writer.WritePropertyName(ConvertName(nameof(value.TotalDuration)));
                 JsonSerializer.Serialize(writer, value.TotalDuration, options);
 
-                writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Entries)));
+                writer.WritePropertyName(ConvertName(nameof(value.Entries)));
                 JsonSerializer.Serialize(writer, value.Entries, options);
 
                 writer.WriteEndObject();
@@ -257,7 +261,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                         var propertyName = reader.GetString();
                         reader.Read();
 
-                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName.ToLowerInvariant())
+                        switch (options.PropertyNameCaseInsensitive ? propertyName : propertyName?.ToLowerInvariant())
                         {
                             case "Status":
                             case "status":
@@ -297,35 +301,38 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 
             public override void Write(Utf8JsonWriter writer, HealthReportEntry value, JsonSerializerOptions options)
             {
+                string ConvertName(string name)
+                    => options.PropertyNamingPolicy?.ConvertName(name) ?? name;
+
                 writer.WriteStartObject();
 
-                writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Status)));
+                writer.WritePropertyName(ConvertName(nameof(value.Status)));
                 JsonSerializer.Serialize(writer, value.Status, options);
 
                 if (!(value.Description is null) || !options.IgnoreNullValues)
                 {
-                    writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Description)));
+                    writer.WritePropertyName(ConvertName(nameof(value.Description)));
                     JsonSerializer.Serialize(writer, value.Description, options);
                 }
 
-                writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Duration)));
+                writer.WritePropertyName(ConvertName(nameof(value.Duration)));
                 JsonSerializer.Serialize(writer, value.Duration, options);
 
                 if (!(value.Data is null) || !options.IgnoreNullValues)
                 {
-                    writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Data)));
+                    writer.WritePropertyName(ConvertName(nameof(value.Data)));
                     JsonSerializer.Serialize(writer, value.Data, options);
                 }
 
                 if (!(value.Exception is null) || !options.IgnoreNullValues)
                 {
-                    writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Exception)));
+                    writer.WritePropertyName(ConvertName(nameof(value.Exception)));
                     JsonSerializer.Serialize(writer, value.Exception, options);
                 }
 
                 if (!(value.Tags is null) || !options.IgnoreNullValues)
                 {
-                    writer.WritePropertyName(options.PropertyNamingPolicy.ConvertName(nameof(value.Tags)));
+                    writer.WritePropertyName(ConvertName(nameof(value.Tags)));
                     JsonSerializer.Serialize(writer, value.Tags, options);
                 }
 
