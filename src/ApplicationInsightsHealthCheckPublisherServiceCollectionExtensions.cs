@@ -12,14 +12,17 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             _ = builder ?? throw new ArgumentNullException(nameof(builder));
             builder.Services.AddOptions<ApplicationInsightsHealthCheckPublisherOptions>()
-                .Configure<IConfiguration>((options, configuration) => configuration.GetSection(nameof(ApplicationInsightsHealthCheckPublisher)).Bind(options))
                 .Configure(options =>
                 {
-                    options.RunLocation = Environment.MachineName;
+                    var websiteSiteName = Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME");
+                    var websiteSlotName = Environment.GetEnvironmentVariable("WEBSITE_SLOT_NAME");
+
+                    options.RunLocation = string.IsNullOrEmpty(websiteSiteName) ? Environment.MachineName : websiteSiteName;
                     options.ApplicationName = Assembly.GetEntryAssembly().GetName().Name;
-                    options.EnvironmentName = Environment.MachineName;
-                    configure?.Invoke(options);
-                });
+                    options.EnvironmentName = string.IsNullOrEmpty(websiteSlotName) ? Environment.MachineName : websiteSlotName;
+                })
+                .Configure<IConfiguration>((options, configuration) => configuration.GetSection(nameof(ApplicationInsightsHealthCheckPublisher)).Bind(options))
+                .Configure(options => configure?.Invoke(options));
             builder.Services.AddSingleton<IHealthCheckPublisher, ApplicationInsightsHealthCheckPublisher>();
             return builder;
         }
