@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 
             var metrics = new Dictionary<string, double>();
 
-            if (!(entry.Value.Data is null))
+            if (entry.Value.Data is not null)
             {
                 foreach (var data in entry.Value.Data)
                 {
@@ -81,7 +81,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
 
             metrics.Add($"{nameof(HealthReportEntry)}{nameof(HealthReportEntry.Duration)}", entry.Value.Duration.TotalMilliseconds);
 
-            if (!(entry.Value.Exception is null))
+            if (entry.Value.Exception is not null)
             {
                 client.TrackException(entry.Value.Exception, properties, metrics);
             }

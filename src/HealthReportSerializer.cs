@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
         private class TimeSpanConverter : JsonConverter<TimeSpan>
         {
             public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-                => TimeSpan.Parse(reader.GetString(), CultureInfo.InvariantCulture);
+                => TimeSpan.Parse(reader.GetString()!, CultureInfo.InvariantCulture);
 
             public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
                 => writer.WriteStringValue(value.ToString());
@@ -104,7 +104,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                     }
                 }
 
-                type ??= typeof(Exception).AssemblyQualifiedName;
+                type ??= typeof(Exception).AssemblyQualifiedName!;
 
                 return new JsonSerializedException(type, message, source, stackTrace, innerException);
             }
@@ -134,19 +134,19 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                     writer.WriteString(ConvertName(nameof(Type)), value.GetType().AssemblyQualifiedName);
                 }
 
-                if (!(value.Message is null) || !options.IgnoreNullValues)
+                if (value.Message is not null || !options.IgnoreNullValues)
                 {
                     writer.WriteString(ConvertName(nameof(value.Message)), value.Message);
                 }
 
                 writer.WriteString(ConvertName(nameof(value.StackTrace)), value.StackTrace);
 
-                if (!(value.Source is null) || !options.IgnoreNullValues)
+                if (value.Source is not null || !options.IgnoreNullValues)
                 {
                     writer.WriteString(ConvertName(nameof(value.Source)), value.Source);
                 }
 
-                if (!(value.InnerException is null) || !options.IgnoreNullValues)
+                if (value.InnerException is not null || !options.IgnoreNullValues)
                 {
                     writer.WritePropertyName(ConvertName(nameof(value.InnerException)));
                     if (value.InnerException is null)
@@ -309,7 +309,7 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                 writer.WritePropertyName(ConvertName(nameof(value.Status)));
                 JsonSerializer.Serialize(writer, value.Status, options);
 
-                if (!(value.Description is null) || !options.IgnoreNullValues)
+                if (value.Description is not null || !options.IgnoreNullValues)
                 {
                     writer.WritePropertyName(ConvertName(nameof(value.Description)));
                     JsonSerializer.Serialize(writer, value.Description, options);
@@ -318,19 +318,19 @@ namespace Microsoft.Extensions.Diagnostics.HealthChecks.ApplicationInsights
                 writer.WritePropertyName(ConvertName(nameof(value.Duration)));
                 JsonSerializer.Serialize(writer, value.Duration, options);
 
-                if (!(value.Data is null) || !options.IgnoreNullValues)
+                if (value.Data is not null || !options.IgnoreNullValues)
                 {
                     writer.WritePropertyName(ConvertName(nameof(value.Data)));
                     JsonSerializer.Serialize(writer, value.Data, options);
                 }
 
-                if (!(value.Exception is null) || !options.IgnoreNullValues)
+                if (value.Exception is not null || !options.IgnoreNullValues)
                 {
                     writer.WritePropertyName(ConvertName(nameof(value.Exception)));
                     JsonSerializer.Serialize(writer, value.Exception, options);
                 }
 
-                if (!(value.Tags is null) || !options.IgnoreNullValues)
+                if (value.Tags is not null || !options.IgnoreNullValues)
                 {
                     writer.WritePropertyName(ConvertName(nameof(value.Tags)));
                     JsonSerializer.Serialize(writer, value.Tags, options);

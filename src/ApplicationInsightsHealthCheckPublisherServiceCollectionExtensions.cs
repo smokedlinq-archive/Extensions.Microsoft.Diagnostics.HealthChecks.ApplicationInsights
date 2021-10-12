@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     var websiteSlotName = Environment.GetEnvironmentVariable("WEBSITE_SLOT_NAME");
 
                     options.RunLocation = string.IsNullOrEmpty(websiteSiteName) ? Environment.MachineName : websiteSiteName;
-                    options.ApplicationName = Assembly.GetEntryAssembly().GetName().Name;
+                    options.ApplicationName = Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
                     options.EnvironmentName = string.IsNullOrEmpty(websiteSlotName) ? Environment.MachineName : websiteSlotName;
                 })
                 .Configure<IConfiguration>((options, configuration) => configuration.GetSection(nameof(ApplicationInsightsHealthCheckPublisher)).Bind(options))

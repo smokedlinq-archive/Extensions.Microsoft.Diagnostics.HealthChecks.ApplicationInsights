@@ -8,6 +8,6 @@ namespace Extensions.Microsoft.Diagnostics.HealthChecks.ApplicationInsights.Test
     public class HealthReportEntryFixture : ICustomizeFixture<HealthReportEntry>
     {
         public HealthReportEntry Customize(IFixture fixture)
-            => new HealthReportEntry(fixture.Create<HealthStatus>(), fixture.Create<string>(), fixture.Create<TimeSpan>(), null, new Dictionary<string, object>());
+            => new(fixture.Create<HealthStatus>(), fixture.Create<string>(), fixture.Create<TimeSpan>(), null, new Dictionary<string, object>());
     }
 }
